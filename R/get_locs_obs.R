@@ -33,10 +33,9 @@ locs_obs <- sf::st_read(con,Id("telem","geo_wc_locs_qa"))  |>
 unlink(here::here('locs_obs'), 
        recursive = TRUE, 
        force = TRUE)
+dir.create(here::here('locs_obs'))
 
-write_dataset(locs_obs,
-              path='locs_obs',
-              format="parquet",
-              partitioning = 'speno')
+write_parquet(locs_obs,
+              here::here('locs_obs/locs_obs.parquet'))
 
 dbDisconnect(con, disconnect = TRUE)
