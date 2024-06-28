@@ -19,12 +19,20 @@ tryCatch({
 })
 
 tbl_deploy <- dplyr::tbl(con,in_schema("telem","tbl_tag_deployments")) |> 
+  dplyr::filter(meta_project %in% c('Ice Seals'),
+                species %in% c('Hf','Pl')) |> 
   dplyr::collect()
+
+unlink(here::here('tbl_deploy'), 
+       recursive = TRUE, 
+       force = TRUE)
+dir.create(here::here('tbl_deploy'))
+
+write_parquet(tbl_deploy,
+              here::here('tbl_deploy/tbl_deploy.parquet'))
 
 locs_obs <- sf::st_read(con,Id("telem","geo_wc_locs_qa"))  |> 
   dplyr::left_join(tbl_deploy) |> 
-  dplyr::filter(meta_project %in% c('Ice Seals'),
-                species %in% c('Hf','Pl')) |> 
   dplyr::select(speno,deployid,ptt,instr,tag_family,type,quality,locs_dt,latitude,longitude,
                 error_radius, error_semi_major_axis,error_semi_minor_axis,
                 error_ellipse_orientation, project, species, qa_status,deploy_dt, end_dt,
