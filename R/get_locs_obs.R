@@ -23,7 +23,12 @@ tbl_speno <- dplyr::tbl(con,in_schema("capture","for_telem"))
 tbl_deploy <- dplyr::tbl(con,in_schema("telem","tbl_tag_deployments")) |> 
   dplyr::filter(meta_project %in% c('Ice Seals'),
                 species %in% c('Hf','Pl')) |> 
-  dplyr::left_join(tbl_speno) |> 
+  dplyr::mutate(species = case_when(
+    species == 'Hf' ~ 'Ribbon seal',
+    species == 'Pl' ~ 'Spotted seal',
+    .default = NA
+  )) |> 
+  dplyr::left_join(tbl_speno, by = c("speno","species")) |> 
   dplyr::collect()
 
 unlink(here::here('tbl_deploy'), 
